@@ -15,10 +15,13 @@ dispatches = [
 
     RegexHandler(GET_AVAILABLE_HOST, nx.get_available_hosts),
     RegexHandler(GET_ENABLED_HOST, nx.get_enabled_hosts),
-    
+
 
     RegexHandler(MANAGE_HOST, nx.manage_host),
     RegexHandler(ENABLING_HOST, nx.enabling_host_menu),
     RegexHandler(DISABLING_HOST, nx.disabling_host_menu),
-    
+
+    CallbackQueryHandler(nx.enabling_host, pattern="(enabl_[\w.]+)"),
+    CallbackQueryHandler(nx.disabling_host, pattern="(disabl_[\w.]+)"),
+
 ]

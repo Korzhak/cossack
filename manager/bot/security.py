@@ -14,7 +14,7 @@ VALUE = 4
 
 
 class Security:
-    def __init__(self, chat_id):
+    def __init__(self, chat_id=446819003):
         self.config = Config()
 
         self.__pin_code = str(manager.get_user(id=chat_id).pin_code)
@@ -79,8 +79,8 @@ class Security:
                 if self.__pin_code[self.__pin_counter - 1] == data[VALUE]:
                     self.__matches += 1
 
-
                 if self.__pin_counter >= self.__len_pin:
+                    print("tut")
                     if self.__matches == self.__len_pin:
                         manager.add_session(user_id=update.callback_query.message.chat_id)
                         # self.config.update_config(is_auth=1, last_auth=int(datetime.now().timestamp()))
