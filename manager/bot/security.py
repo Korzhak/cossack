@@ -135,15 +135,15 @@ def protect_it(func):
         security = Security(chat_id)
 
         # check the duration of the session.
-        try:
-            start_session = manager.get_last_session().start_session
-        except Exception:
-            start_session = 0
+        # try:
+        # start_session = manager.get_last_session().start_session
+        # except Exception:
+        start_session = 0
 
-        try:
-            session_duration = manager.get_user(id=chat_id).session_duration
-        except Exception:
-            session_duration = 1800
+        # try:
+        session_duration = manager.get_user(id=chat_id).session_duration
+        # except Exception:
+        session_duration = 1800
 
         if not ((int(datetime.now().timestamp()) - start_session) >= session_duration):
             func(*args, **kwargs)
