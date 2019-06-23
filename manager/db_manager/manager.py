@@ -47,5 +47,12 @@ def get_pin_data(id: int, update_pin_counter: int = 2,
     return user.pin_code, user.pin_counter, user.pin_matches
 
 
-def get_last_session():
-    return db.query(BotSession).order_by(desc(BotSession.start_session)).first()
+def get_last_session(id: int):
+    return db.query(BotSession).filter_by(user_id=id).order_by(desc(BotSession.start_session)).first()
+
+
+def update_bot_session(id: int, path: str = "~/"):
+    session = get_last_session(id)
+    session.current_directory = path
+    db.commit()
+    return session

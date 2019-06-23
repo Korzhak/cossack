@@ -1,5 +1,5 @@
 from subprocess import *
-
+from manager.db_manager.manager import update_bot_session, get_last_session
 
 class OS:
     def runner(self, cmd, return_result=False):
@@ -16,11 +16,13 @@ class OS:
                 return res.decode("utf-8")
             return 0
 
+
     def sudo(self, password, run=False):
         cmd = f"echo {password} | sudo -S "
         if not run:
             return cmd
         return self.runner(cmd, return_result=True)
+
 
     def service(self, tool, action, run=False):
         cmd = f"service {tool} {action}"
@@ -28,17 +30,37 @@ class OS:
             return cmd
         return self.runner(cmd, return_result=True)
 
-    def ls(self, path, run=True):
-        cmd = "ls " + path
+
+    def ls(self, user_id: int, path: str = '', keys: str = '', run=True):
+        session = get_last_session(id=user_id)
+        cmd = ''
+        if not path:
+            cmd += f"ls {session.current_directory} {keys if keys else ''}"
+        else:
+            cmd += f"ls {path} {keys if keys else ''}"
         if not run:
             return cmd
         return self.runner(cmd, return_result=True)
 
-    def pwd(self, run=True):
-        cmd = "pwd"
-        if not run:
-            return cmd
-        return self.runner(cmd, return_result=True)
+
+    def pwd(self, user_id: int):
+        session = get_last_session(id=user_id)
+        return session.current_directory
+
+
+    def cd(self, user_id: int, path: str):
+        session = get_last_session(id=user_id)
+
+        if path[0] != "/" and path[0] != "~":
+            full_path = f"{session.current_directory}/{path}"
+        else:
+            full_path = path
+
+        cmd = f"cd {full_path}"
+
+        self.runner(cmd, return_result=True)
+        update_bot_session(id=user_id, path=full_path)
+
 
     def __str__(self):
         cmd = "uname -a"

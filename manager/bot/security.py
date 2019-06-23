@@ -156,7 +156,7 @@ def protect_it(func):
         security = Security(chat_id)
         # check the duration of the session.
         try:
-            start_session = manager.get_last_session().start_session
+            start_session = manager.get_last_session(chat_id).start_session
         except Exception:
             start_session = 0
 
