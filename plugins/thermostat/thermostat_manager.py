@@ -41,11 +41,8 @@ class ThermostatBox:
             while amount_received < amount_expected:
                 data = self.sock.recv(1024)
                 amount_received += len(data)
-                print(data.decode())
                 res = re.findall(pattern, data.decode())
-#                print(res)
         finally:
 
             self.sock.close()
             return res
-
