@@ -1,7 +1,5 @@
 from manager.os_manager import OS
-from manager.config_parser import Config
-
-config = Config()
+from manager import config
 
 
 class NginxManager(OS):

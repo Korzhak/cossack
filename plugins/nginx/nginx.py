@@ -16,7 +16,7 @@ class Nginx:
 
         self.manage_host_keyboard = [
             [commands.ENABLING_HOST, commands.DISABLING_HOST],
-            [commands.BACK_TO_HOME]
+            [commands.NGINX]
         ]
 
     def nginx_menu(self, bot, update):

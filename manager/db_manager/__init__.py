@@ -20,6 +20,9 @@ class User(Base):
     permission = Column(Integer)
     session_duration = Column(Integer)
 
+    pin_counter = Column(Integer, default=0)
+    pin_matches = Column(Integer, default=0)
+
     def __repr__(self):
        return f"<User {self.user_id} | permission: {self.permission}>"
 
@@ -37,3 +40,5 @@ class BotSession(Base):
               f"start time: {datetime.fromtimestamp(self.start_session)}>"
 
 
+def create_db():
+    Base.metadata.create_all(engine)

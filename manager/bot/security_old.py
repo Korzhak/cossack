@@ -1,4 +1,5 @@
 import telegram
+from manager.config_parser import Config
 from manager.db_manager import manager
 from .answers import *
 
@@ -9,27 +10,25 @@ SUCCESS_STATE = 3
 CLEAN_STATE = 4
 CLOSE_STATE = 5
 
-INCREMENT_PIN_DATA = 1
-NULLIFY_PIN_DATA = 0
-WITHOUT_UPDATE_PIN_DATA = 2
-
 VALUE = 4
 
 
 class Security:
-    def __init__(self, chat_id=0):
-        self.__pin_code = str(manager.get_user(id=chat_id).pin_code) if chat_id != 0 else ''
+    def __init__(self, chat_id=446819003):
+        self.config = Config()
+
+        self.__pin_code = str(manager.get_user(id=chat_id).pin_code)
         self.__pin_counter = 0
         self.__len_pin = len(self.__pin_code)
         self.__matches = 0
 
-    def send_menu(self, bot, update, state=START_STATE, pin_counter=0):
+    def send_menu(self, bot, update, state=START_STATE):
         if state == START_STATE:
             update.message.reply_text(text=PIN_CODE_TEXT,
                                       reply_markup=telegram.InlineKeyboardMarkup(self.get_keypad()),
                                       parse_mode='HTML')
         elif state == UPDATE_STATE:
-            bot.edit_message_text(text=PIN_CODE_TEXT+("*" * pin_counter),
+            bot.edit_message_text(text=PIN_CODE_TEXT+("*" * self.__pin_counter),
                                   reply_markup=telegram.InlineKeyboardMarkup(self.get_keypad()),
                                   chat_id=update.callback_query.message.chat_id,
                                   message_id=update.callback_query.message.message_id,
@@ -63,15 +62,11 @@ class Security:
 
     def check_code(self, bot, update):
         data = update.callback_query.data
-        user_id = update.callback_query.message.chat_id
 
         if data[:4] == "sec_":
             if data[VALUE] == "<" or data[VALUE] == "x":
-                manager.get_pin_data(
-                    user_id,
-                    update_pin_counter=NULLIFY_PIN_DATA,
-                    update_pin_matches=NULLIFY_PIN_DATA,
-                )
+                self.__pin_counter = 0
+                self.__matches = 0
 
                 if data[VALUE] == "<":
                     self.send_menu(bot, update, CLEAN_STATE)
@@ -79,39 +74,23 @@ class Security:
                     self.send_menu(bot, update, CLOSE_STATE)
 
             else:
-                pin_code, pin_counter, pin_matches = manager.get_pin_data(
-                    user_id,
-                    update_pin_counter=INCREMENT_PIN_DATA
-                )
+                self.__pin_counter += 1
 
-                try:
-                    if str(pin_code)[pin_counter - 1] == data[VALUE]:
-                        pin_code, pin_counter, pin_matches = manager.get_pin_data(
-                            user_id,
-                            update_pin_matches=INCREMENT_PIN_DATA
-                        )
-                except:
-                    pin_code, pin_counter, pin_matches = manager.get_pin_data(
-                        user_id,
-                        update_pin_counter=NULLIFY_PIN_DATA,
-                        update_pin_matches=NULLIFY_PIN_DATA,
-                    )
+                if self.__pin_code[self.__pin_counter - 1] == data[VALUE]:
+                    self.__matches += 1
 
-                pin_len = len(str(pin_code))
-
-                if pin_counter >= pin_len:
-                    manager.get_pin_data(
-                        user_id,
-                        update_pin_counter=NULLIFY_PIN_DATA,
-                        update_pin_matches=NULLIFY_PIN_DATA,
-                    )
-                    if pin_matches == pin_len:
+                if self.__pin_counter >= self.__len_pin:
+                    print("tut")
+                    if self.__matches == self.__len_pin:
                         manager.add_session(user_id=update.callback_query.message.chat_id)
+                        # self.config.update_config(is_auth=1, last_auth=int(datetime.now().timestamp()))
                         self.send_menu(bot, update, SUCCESS_STATE)
                     else:
+                        self.__pin_counter = 0
+                        self.__matches = 0
                         self.send_menu(bot, update, ERROR_STATE)
                 else:
-                    self.send_menu(bot, update, UPDATE_STATE, pin_counter=pin_counter)
+                    self.send_menu(bot, update, UPDATE_STATE)
 
 
     @staticmethod
@@ -149,25 +128,44 @@ def protect_it(func):
     :return: decorator
     """
     from datetime import datetime
+    print("tut1")
 
     def wrapper(*args, **kwargs):
         chat_id = args[2].message.chat.id
 
         security = Security(chat_id)
+
         # check the duration of the session.
-        try:
-            start_session = manager.get_last_session().start_session
-        except Exception:
-            start_session = 0
+        # try:
+        # start_session = manager.get_last_session().start_session
+        # except Exception:
+        start_session = 0
 
-        try:
-            session_duration = manager.get_user(id=chat_id).session_duration
-        except Exception:
-            session_duration = 1800
-
+        # try:
+        session_duration = manager.get_user(id=chat_id).session_duration
+        # except Exception:
+        session_duration = 1800
+        print("tut2")
         if not ((int(datetime.now().timestamp()) - start_session) >= session_duration):
             func(*args, **kwargs)
         else:
             security.send_menu(*args[1:], **kwargs)
+
+    return wrapper
+
+
+def protect_it_(func):
+    """
+    Decorator for protect bot function
+    :param func: decorating function
+    :return: decorator
+    """
+    from datetime import datetime
+
+    def wrapper(*args, **kwargs):
+        print("tut2")
+
+        func(*args, **kwargs)
+
 
     return wrapper

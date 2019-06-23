@@ -1,9 +1,8 @@
 from manager.os_manager import OS
-from manager.config_parser import Config
+from manager import config
+
 
 class Shell(OS):
-    def __init__(self):
-        self.config = Config()
 
     def command(self, cmd: str):
         is_sudo = False
@@ -12,8 +11,4 @@ class Shell(OS):
         if sudo_start != -1:
             is_sudo = True
             cmd = cmd[5:]
-        self.runner(f"{self.sudo(self.config.os.sudo_password) if is_sudo else ''} {cmd}")
-
-
-
-
+        self.runner(f"{self.sudo(config.os.sudo_password) if is_sudo else ''} {cmd}")
