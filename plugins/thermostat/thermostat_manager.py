@@ -47,3 +47,7 @@ class ThermostatBox:
         finally:
 
             self.sock.close()
+
+
+t = ThermostatBox()
+t.get_data_from_box()
