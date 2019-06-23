@@ -24,11 +24,16 @@ class ShellManager(OS):
     def command(self, user_id: int, cmd: str):
         is_sudo = False
         sudo_start = cmd.find("sudo")
-
         cmd = cmd[1:]
+        pwd = self.pwd(user_id=user_id)
+        cmd = cmd.replace("{P}", pwd+("/" if pwd[-1] != "/" else ""))\
+                 .replace("{PATH}", pwd+("/" if pwd[-1] != "/" else ""))
 
         if sudo_start != -1:
             is_sudo = True
             cmd = cmd[5:]
 
-        return self.runner(f"{self.sudo(config.os.sudo_password) if is_sudo else ''} {cmd}", return_result=True)
+        return self.runner(
+            f"{self.sudo(config.os.sudo_password) if is_sudo else ''} {cmd}",
+            return_result=True
+        ).replace("\n", "\n\n")
