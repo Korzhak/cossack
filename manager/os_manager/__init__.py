@@ -51,10 +51,17 @@ class OS:
     def cd(self, user_id: int, path: str):
         session = get_last_session(id=user_id)
 
-        if path[0] != "/" and path[0] != "~":
+        if path == ".." or path == "../":
+            full_path = "/".join(session.current_directory.split("/")[:-1])
+
+        elif path[0] != "/" and path[0] != "~":
             full_path = f"{session.current_directory}/{path}"
+
         else:
             full_path = path
+
+        if not full_path:
+            full_path = "/"
 
         cmd = f"cd {full_path}"
 
