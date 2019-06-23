@@ -1,5 +1,6 @@
 import telegram
 from .thermostat_manager import ThermostatBox
+from manager.bot.security import protect_it
 
 class Thermostat:
     def __init__(self):
@@ -8,12 +9,14 @@ class Thermostat:
             ["Back to home"]
         ]
 
+    @protect_it
     def ts_menu(self, bot, update):
         reply_markup = telegram.ReplyKeyboardMarkup(self.custom_keyboard)
         bot.send_message(chat_id=update.message.chat_id,
                          text="Thermostat-box managing",
                          reply_markup=reply_markup)
 
+    @protect_it
     def get_data(self, bot, update):
         ts = ThermostatBox()
         text = ts.get_data_from_box()
