@@ -19,16 +19,11 @@ class NginxManager(OS):
         cmd = f"{self.sudo(config.os.sudo_password)}{self.service('nginx', 'status')}"
         return self.runner(cmd, return_result=True)
 
-    def get_enabled_hosts(self):
-        # cmd = f'grep "server_name " /etc/nginx/sites-enabled/*;'
-        # return self.runner(cmd, return_result=True) \
-        #     .replace('#либо ip, либо доменное имя', '') \
-        #     .replace('server_name ', '') \
-        #     .replace(';', '')
-        return self.ls(path="/etc/nginx/sites-enabled/")
+    def get_enabled_hosts(self, user_id):
+        return self.ls(user_id=user_id, path="/etc/nginx/sites-enabled/")
 
-    def get_available_host(self):
-        return self.ls(path="/etc/nginx/sites-available/")
+    def get_available_host(self, user_id):
+        return self.ls(user_id=user_id, path="/etc/nginx/sites-available/")
 
     def enabling_host(self, name_file):
         cmd = f'{self.sudo(config.os.sudo_password)} ln -s ' \

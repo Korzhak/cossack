@@ -62,16 +62,16 @@ class Nginx:
             bot.send_message(chat_id=update.message.chat_id, text=resp)
 
     def get_enabled_hosts(self, bot, update):
-        resp = self.nx.get_enabled_hosts()
+        resp = self.nx.get_enabled_hosts(update.message.chat_id)
         bot.send_message(chat_id=update.message.chat_id, text=resp)
 
     def get_available_hosts(self, bot, update):
-        resp = self.nx.get_available_host()
+        resp = self.nx.get_available_host(update.message.chat_id)
         bot.send_message(chat_id=update.message.chat_id, text=resp)
 
     def enabling_host_menu(self, bot, update):
         host_keypad = []
-        for host in self.nx.get_available_host().split():
+        for host in self.nx.get_available_host(update.message.chat_id).split():
             host_keypad.append(
                 [telegram.InlineKeyboardButton(host, callback_data=f'enabl_{host}')]
             )
@@ -82,12 +82,12 @@ class Nginx:
 
     def disabling_host_menu(self, bot, update):
         host_keypad = []
-        for host in self.nx.get_enabled_hosts().split():
+        for host in self.nx.get_enabled_hosts(update.message.chat_id).split():
             host_keypad.append(
                 [telegram.InlineKeyboardButton(host, callback_data=f'disabl_{host}')]
             )
 
-        update.message.reply_text(text=answers.CHOOSE_AVAILABLE_HOST,
+        update.message.reply_text(text=answers.CHOOSE_ENABLED_HOST,
                                   reply_markup=telegram.InlineKeyboardMarkup(host_keypad),
                                   parse_mode='HTML')
 
