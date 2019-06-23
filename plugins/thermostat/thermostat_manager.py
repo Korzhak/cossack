@@ -3,7 +3,7 @@ import re
 
 pattern = r"([\d.]+)"
 SOCK_HOST = 'localhost'
-SOCK_PORT = 10001
+SOCK_PORT = 10000
 
 GET_DATA = "get_data"
 
@@ -43,7 +43,7 @@ class ThermostatBox:
                 amount_received += len(data)
                 print(data.decode())
                 res = re.findall(pattern, data.decode())
-
+#                print(res)
         finally:
 
             self.sock.close()

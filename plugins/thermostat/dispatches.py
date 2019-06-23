@@ -6,5 +6,5 @@ ts = Thermostat()
 
 dispatches = [
     RegexHandler("TS", ts.ts_menu),
-    RegexHandler("get_ts_data", ts.get_data),
+    RegexHandler("Get data from TS", ts.get_data),
 ]
