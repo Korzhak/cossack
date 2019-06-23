@@ -5,3 +5,4 @@ db.sqlite
 local_config.ini
 __pycache__
 .idea
+*.log
