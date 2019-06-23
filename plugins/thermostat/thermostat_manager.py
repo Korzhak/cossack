@@ -26,6 +26,7 @@ class ThermostatBox:
             self.sock.close()
 
     def get_data_from_box(self):
+        res = ''
         try:
 
             # Send data
@@ -42,12 +43,9 @@ class ThermostatBox:
                 amount_received += len(data)
                 print(data.decode())
                 res = re.findall(pattern, data.decode())
-                print(res)
 
         finally:
 
             self.sock.close()
+            return res
 
-
-t = ThermostatBox()
-t.get_data_from_box()
